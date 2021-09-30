@@ -46,6 +46,7 @@ public void Shop_Started()
 				KvGetString(hKeyValues, "description", sDescription, sizeof(sDescription));
 				Shop_SetCustomInfo("wr_immunity", 1);
 				Shop_SetInfo(sName, sDescription, KvGetNum(hKeyValues, "price", 1000), KvGetNum(hKeyValues, "sell", 10), Item_Togglable, hKeyValues.GetNum("duration", 0));
+				Shop_SetHide(!!hKeyValues.GetNum("hide", 0));
 				Shop_SetCallbacks(_, OnEquipItem, _, _, _, _, OnBuyItem, _, Shop_OnItemElapsed);
 				Shop_EndItem();
 			}
