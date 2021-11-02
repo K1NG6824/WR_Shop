@@ -6,7 +6,7 @@ public Plugin myinfo =
 {
 	name = "[Shop] Buy Immunity",
 	author = "K1NG",
-	version = "1.0",
+	version = "1.1",
 	description = "http//projecttm.ru/"
 };
 
@@ -47,13 +47,28 @@ public void Shop_Started()
 				Shop_SetCustomInfo("wr_immunity", 1);
 				Shop_SetInfo(sName, sDescription, KvGetNum(hKeyValues, "price", 1000), KvGetNum(hKeyValues, "sell", 10), Item_Togglable, hKeyValues.GetNum("duration", 0));
 				Shop_SetHide(!!hKeyValues.GetNum("hide", 0));
-				Shop_SetCallbacks(_, OnEquipItem, _, _, _, _, OnBuyItem, _, Shop_OnItemElapsed);
+				Shop_SetCallbacks(_, OnEquipItem, _, _, _, _, OnBuyItem, ItemSellCallback, Shop_OnItemElapsed);
 				Shop_EndItem();
 			}
 		} while (KvGotoNextKey(hKeyValues));
 	}
 
 	delete hKeyValues;
+}
+
+public bool ItemSellCallback(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price)
+{
+	if(K1_WR_IsStarted())
+    {
+        if(K1_WR_TakeImmunity(client))
+		{
+			if(!K1_WR_CheckImmunity(client))
+            	K1_WR_DropWeapon(client);
+
+			return true;
+		}
+    }
+	return false;
 }
 
 public bool OnBuyItem(int iClient, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value)
@@ -76,61 +91,25 @@ public Shop_OnItemElapsed(int iClient, CategoryId category_id, const char[] cate
 public ShopAction OnEquipItem(int iClient, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, bool isOn, bool elapsed) 
 {
     ArrayList hLocalArray = Shop_GetClientItems(iClient);
-    int iSize = hLocalArray.Length;
-    int iCheck;
 	if (isOn || elapsed)
 	{
-        if(iSize > 0)
-        {
-            for(int i = 0; i < iSize; ++i)
-            {
-                if(Shop_GetItemCustomInfo(hLocalArray.Get(i), "wr_immunity", -1) == 1)
-                {
-                    if(Shop_IsClientItemToggled(iClient, hLocalArray.Get(i)))
-                        iCheck++;
-                }
-            }
-        }
-        if(iCheck > 1)
-            return Shop_UseOff;
-
 		if(K1_WR_IsStarted())
         {
-			if(K1_WR_TakeImmunity(iClient))
-            {
-		        if(!K1_WR_CheckImmunity(iClient))
-                    K1_WR_DropWeapon(iClient);
-            }
-            else
-	            return Shop_UseOn;
+			K1_WR_TakeImmunity(iClient);
+			if(!K1_WR_CheckImmunity(iClient))
+				K1_WR_DropWeapon(iClient);
+
+	        return Shop_UseOff;
         }
 		return Shop_UseOff;
 	}
 
-
-    if(iSize > 0)
-    {
-        for(int i = 0; i < iSize; ++i)
-        {
-            if(Shop_GetItemCustomInfo(hLocalArray.Get(i), "wr_immunity", -1) == 1)
-            {
-                if(Shop_IsClientItemToggled(iClient, hLocalArray.Get(i)))
-                    iCheck = true;
-            }
-        }
-    }
-    if(iCheck > 0)
-        return Shop_UseOn;
-
 	if(K1_WR_IsStarted())
     {
         if(K1_WR_GiveImmunity(iClient))
-        {
-          	Shop_ToggleClientCategoryOff(iClient, category_id);
 	        return Shop_UseOn;  
-        }
     }
-    return Shop_UseOn;
+    return Shop_UseOff;
 }
 
 public OnPluginEnd() 
