@@ -6,7 +6,7 @@ public Plugin myinfo =
 {
 	name = "[Shop] Buy Immunity",
 	author = "K1NG",
-	version = "1.1",
+	version = "1.2",
 	description = "http//projecttm.ru/"
 };
 
