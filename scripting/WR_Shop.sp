@@ -45,7 +45,7 @@ public void Shop_Started()
 				KvGetString(hKeyValues, "name", sName, sizeof(sName), sName);
 				KvGetString(hKeyValues, "description", sDescription, sizeof(sDescription));
 				Shop_SetCustomInfo("wr_immunity", 1);
-				Shop_SetInfo(sName, sDescription, KvGetNum(hKeyValues, "price", 1000), KvGetNum(hKeyValues, "sell", 10), Item_Togglable, hKeyValues.GetNum("duration", 0));
+				Shop_SetInfo(sName, sDescription, KvGetNum(hKeyValues, "price", 1000), KvGetNum(hKeyValues, "sell", 10), Item_Togglable, hKeyValues.GetNum("duration", 0), KvGetNum(hKeyValues, "price_gold", -1), KvGetNum(hKeyValues, "sell_gold", -1));
 				Shop_SetHide(!!hKeyValues.GetNum("hide", 0));
 				Shop_SetCallbacks(_, OnEquipItem, _, _, _, _, OnBuyItem, ItemSellCallback, Shop_OnItemElapsed);
 				Shop_EndItem();
@@ -71,7 +71,7 @@ public bool ItemSellCallback(int client, CategoryId category_id, const char[] ca
 	return false;
 }
 
-public bool OnBuyItem(int iClient, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value)
+public bool OnBuyItem(int iClient, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value, int price_gold, int sell_price_gold)
 {
 	if(!K1_WR_IsStarted())
 		return false;
